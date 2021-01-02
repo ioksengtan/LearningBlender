@@ -15,7 +15,7 @@ for line in lines:
 	reg['thumbnail'] = data[4]
 	reg['date'] = data[5]
 	reg['tags'] = data[6]
-        reg['object'] = data[7]
+    reg['object'] = data[7]
 	rows.append(reg)	
 f.close()
 data = {}
