@@ -14,10 +14,12 @@ for line in lines:
 	reg['description'] = data[3]
 	reg['thumbnail'] = data[4]
 	reg['date'] = data[5]
+    reg['tags'] = data[6]
+    reg['object'] = data[7]
 	rows.append(reg)	
 f.close()
 data = {}
 data['table'] = rows
-f = open('data.json','w')
+f = open('data.json.raw','w')
 json.dump(data, f)
 f.close()

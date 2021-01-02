@@ -1,1 +1,2 @@
 python db2json.py db
+cat data.json.raw tmp > data.json
