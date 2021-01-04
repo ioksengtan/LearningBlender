@@ -1,3 +1,8 @@
-python db2json.py db
+sort -t '	' -k 8 db > db.proc
+cat db.proc| awk 'BEGIN {FS="\t"};{print $8}'  | awk NF > list_objects
+python db2json.py db.proc
+python list_objects2json.py list_objects
 echo "data = " > data.json
+echo "objects = " > objects.json
 cat data.json.raw post_proc.py >> data.json
+cat objects.json.raw objects_post_proc.py >> objects.json 
