@@ -1,3 +1,5 @@
+const appResources = "https://script.google.com/macros/s/AKfycbyz7TsoPaQzvJtidUv4j1ZB7aG5U5PbNVAhj4eWlQ/exec";
+const appMap = "https://script.google.com/macros/s/AKfycbyG0jwoZdvSgH6J84ZtRuTpY0LdH-53eohtGxRT/exec";	
 $(document).ready(function(){
 	  //setTimeout(render_content('#main', tmp), 1000);
 	  $('#list_all').click(function(){
@@ -5,6 +7,25 @@ $(document).ready(function(){
 			render_content('#main', tmp_objects)
 			render_content('#main', tmp)
 	  })
+	  
+/*
+    npc_sets = [];
+    NpcRole = [];
+	$.get(appMap, {
+        "map_id": 1,
+        "command": "GetNPCsFromMapID"
+    }, function (data) {
+		console.log(data)
+	});
+	*/
+
+    $.getJSON("https://spreadsheets.google.com/feeds/cells/1EA0FNh6uL8xEUK6r2tC21WcGoctYu5VTLHrHmYD4n14/1/public/values?alt=json"
+		
+	
+    , function (data) {
+		console.log(data);
+	});
+	
 });
 function render_object_tag(div_id, string){
 	$(div_id).append(string)

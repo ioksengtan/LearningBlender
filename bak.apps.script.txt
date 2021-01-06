@@ -1,0 +1,151 @@
+
+/*
+var sheet_id = "1EA0FNh6uL8xEUK6r2tC21WcGoctYu5VTLHrHmYD4n14";
+//<tab>_header
+Resources_source = 0;
+Resources_subject = 1;
+Resources_tags = 2;
+Resources_link = 3;
+Resources_title = 4;
+Resources_description = 5;
+Resources_thumbnail = 6;
+Resources_time = 7;
+//num_<tab>
+num_Resources = 8;
+
+function doGet(e) {
+  
+  var params = e.parameter;
+  var inputdata= {}
+  inputdata.command = params.command;
+  inputdata.argument = params.argument;
+  // inputdata.<header> = params.<header>
+  inputdata.source = params.source;
+  inputdata.subject = params.subject;
+  inputdata.tags = params.tags;
+  inputdata.link = params.link;
+  inputdata.title = params.title;
+  inputdata.description = params.description;
+  inputdata.thumbnail = params.thumbnail;
+  inputdata.time = params.time;
+  
+  var SpreadSheet = SpreadsheetApp.openById(sheet_id);
+  //Sheet_<tab>
+  var Sheet_Resources = SpreadSheet.getSheetByName("Resources");
+  var LastRow_Resources = Sheet_Resources.getLastRow();
+  var data_Resources = [];
+  data_Resources = Sheet_Resources.getRange(1,1, LastRow_Resources, num_Resources).getValues();
+  switch(inputdata.command){
+      case('GetAllResources'):
+      Logger.log('GetAllResources');
+      output = {};
+      output['data'] = []
+      var message='';
+      var init_i = 0;
+      for(i=init_i;i<LastRow_Resources;i++){
+        //if(data_Resources[i][NPC_DELETE] !=1 & data_Resources[i][NPC_MAP_ID] == inputdata.map_id){
+            reg = {};
+            reg['source'] = data_Resources[i][Resources_source]; 
+            reg['subject'] = data_Resources[i][Resources_subject];  
+            reg['tags'] = data_Resources[i][Resources_tags]; 
+            reg['link'] = data_Resources[i][Resources_link]; 
+            reg['title'] = data_Resources[i][Resources_title]; 
+            reg['description'] = data_Resources[i][Resources_description]; 
+            reg['thumbnail'] = data_Resources[i][Resources_thumbnail]; 
+            reg['time'] = data_Resources[i][Resources_time]; 
+            output['data'].push(reg);
+            //if(i==4)break;
+        //}
+      }
+      
+      message = JSON.stringify(output);
+      //Logger.log(message);
+      //message = "test";
+      return ContentService.createTextOutput(message);
+      break;
+      
+  }
+  
+}
+
+function doPost(e) {
+  
+  var params = e.parameter;
+  var tab = params.tab;
+  var command = params.command;
+  var argument = params.argument;
+  var filename = params.filename;
+  var FolderID = params.FolderID;
+  var FileID = params.FileID;
+  var content = params.content;
+  var in_draft = params.is_draft;
+  var in_public = params.is_public;
+  var is_star = params.is_star;
+  var uid = params.uid;
+  var smallimg = params.smallimg;
+  //var title = params.title;
+  //var content = params.content;  
+  
+  var SpreadSheet = SpreadsheetApp.openById("1qdG1pGzDavuS_alP7AvzPeXlSWo4-kfYFFnchIc2OQQ");
+  var Sheet = SpreadSheet.getSheetByName("Files");
+  var Sheet_folder = SpreadSheet.getSheetByName("Folders");
+  var Sheet_blog = SpreadSheet.getSheetByName("Blogs");
+  var LastRow = Sheet.getLastRow();    
+  var LastRow_blog = Sheet_blog.getLastRow();  
+  var LastRow_folder = Sheet_folder.getLastRow();
+  var data=[];  
+  var data_blog = [];
+  var data_folder = [];
+  data_blog = Sheet_blog.getRange(1,1, LastRow_blog, 3).getValues();
+  data = Sheet.getRange(1,1, LastRow, 11).getValues();
+  data_folder = Sheet_folder.getRange(1,1, LastRow_folder, 6).getValues();
+  
+  
+  switch(command){
+    case('blog_new'):
+ 
+      
+     Sheet.getRange(LastRow+1, FILES_FILENAME+1).setValue(filename);
+     Sheet.getRange(LastRow+1, FILES_TYPE+1).setValue("md");
+     Sheet.getRange(LastRow+1, FILES_MODE+1).setValue("0");
+     Sheet.getRange(LastRow+1, FILES_FOLDERID+1).setValue(FolderID);
+     Sheet.getRange(LastRow+1, FILES_USERID+1).setValue(uid);
+     var lastFileID = Sheet.getRange(LastRow, 6, 1, 1).getValues();
+     Sheet.getRange(LastRow+1, FILES_FILEID+1).setValue(parseInt(lastFileID)+1);
+     Sheet.getRange(LastRow+1, FILES_DRAFT+1).setValue(in_draft);
+     Sheet.getRange(LastRow+1, FILES_PUBLIC+1).setValue(in_public);
+      Sheet.getRange(LastRow+1, FILES_STAR+1).setValue(is_star);
+      Sheet.getRange(LastRow+1, FILES_SMALLIMG+1).setValue(smallimg);
+      Sheet_blog.getRange(LastRow_blog+1, BLOGS_CONTENT+1).setValue(content);
+      Sheet_blog.getRange(LastRow_blog+1, BLOGS_FILEID+1).setValue(parseInt(lastFileID)+1);
+      
+      
+      return  ContentService.createTextOutput(parseInt(lastFileID)+1);
+      break;
+    case ('blog_update'):
+      for(var i=0;i<LastRow_blog;i++){
+        if(data_blog[i][BLOGS_FILEID]==FileID){
+          Sheet_blog.getRange(i+1, BLOGS_CONTENT+1).setValue(content);
+          
+        }
+      }
+      for(var i=0;i<LastRow;i++){
+        if(data[i][FILES_FILEID]==FileID){
+          Sheet.getRange(i+1, FILES_FILENAME+1).setValue(filename);
+          Sheet.getRange(i+1, FILES_FOLDERID+1).setValue(FolderID);
+          Sheet.getRange(i+1, FILES_DRAFT+1).setValue(in_draft);
+          Sheet.getRange(i+1, FILES_PUBLIC+1).setValue(in_public);
+          Sheet.getRange(i+1, FILES_STAR+1).setValue(is_star);
+          Sheet.getRange(i+1, FILES_USERID+1).setValue(uid);
+          Sheet.getRange(i+1, FILES_SMALLIMG+1).setValue(smallimg);
+        }
+      }
+      return  ContentService.createTextOutput(true);
+      
+      
+      break;      
+  }
+  
+  
+}
+*/
