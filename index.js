@@ -1,5 +1,6 @@
 const appResources = "https://script.google.com/macros/s/AKfycbyz7TsoPaQzvJtidUv4j1ZB7aG5U5PbNVAhj4eWlQ/exec";
 const appMap = "https://script.google.com/macros/s/AKfycbyG0jwoZdvSgH6J84ZtRuTpY0LdH-53eohtGxRT/exec";	
+inputdata = '';
 $(document).ready(function(){
 	  //setTimeout(render_content('#main', tmp), 1000);
 	  $('#list_all').click(function(){
@@ -15,7 +16,8 @@ $(document).ready(function(){
         "map_id": 1,
         "command": "GetNPCsFromMapID"
     }, function (data) {
-		console.log(data)
+		 tmp = data;
+		//console.log(data)
 	});
 	*/
 
@@ -23,10 +25,61 @@ $(document).ready(function(){
 		
 	
     , function (data) {
-		console.log(data);
+		inputdata = data;
+		let table_schema = [
+			{'name': 'source','type':'string'},
+			{'name': 'subjects', 'type':'string'},
+			{'name': 'tags', 'type':'string'},
+			{'name': 'link', 'type':'string'},
+			{'name': 'title', 'type':'string'},
+			{'name': 'description', 'type':'string'},
+			{'name': 'thumbnail', 'type':'string'},
+			{'name': 'time', 'type':'string'},
+		];
+		formed_data = format_data(table_schema, data);
+		//console.log(data);
 	});
 	
 });
+data2 = {};
+data2['table'] = [];
+fields = [];
+function format_data(table_schema, rawdata){
+	num_field = table_schema.length;
+	num_rows = rawdata.feed.entry.length/num_field;
+	num_records = num_rows - 1; // exclude header row. 
+	reg_id_record = 0;
+	for(i_cell=0;i_cell< rawdata.feed.entry.length;i_cell++){
+		//console.log('i_cell:',i_cell);
+		if(parseInt(rawdata.feed.entry[i_cell].gs$cell.row) == 1){
+			//header
+			i_field = rawdata.feed.entry[i_cell].gs$cell.col-1;
+			fields[i_field] = rawdata.feed.entry[i_cell].content.$t;
+			//console.log(fields);
+		}else{
+			id_record = parseInt(rawdata.feed.entry[i_cell].gs$cell.row)-2;
+			id_field = parseInt(rawdata.feed.entry[i_cell].gs$cell.col)-1;
+			//console.log(id_record + ' ' + id_field+' '+reg_id_record);
+			if(typeof(reg_record) == "undefined"){
+				reg_record = {};
+			}else if(i_cell == rawdata.feed.entry.length-1){
+				reg_record[ fields[id_field] ] = rawdata.feed.entry[i_cell].content.$t
+				data2['table'].push(reg_record);
+				console.log('total '+ id_record + ' records imported.');
+
+			}else if(id_field == 0 ){
+				data2['table'].push(reg_record);
+				reg_record = {};
+				reg_record[ fields[id_field] ] = rawdata.feed.entry[i_cell].content.$t
+				//console.log('reset reg_record');
+			}else{
+				reg_record[ fields[id_field] ] = rawdata.feed.entry[i_cell].content.$t
+				//console.log(reg_record);
+			}
+			reg_id_record = id_record;
+		}		
+	}
+}
 function render_object_tag(div_id, string){
 	$(div_id).append(string)
 }
