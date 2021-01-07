@@ -18,13 +18,15 @@ $(document).ready(function(){
 		console.log(data)
 	});
 	*/
-
+	/*
     $.getJSON("https://spreadsheets.google.com/feeds/cells/1EA0FNh6uL8xEUK6r2tC21WcGoctYu5VTLHrHmYD4n14/1/public/values?alt=json"
 		
 	
     , function (data) {
 		console.log(data);
 	});
+	*/
+	$.get("https://script.google.com/macros/s/AKfycbzD39SyYlxCaCCmD2GbWCh3pm6wK9L_Zt5SaxoeUbPenzX_jX8/exec");
 	
 });
 function render_object_tag(div_id, string){

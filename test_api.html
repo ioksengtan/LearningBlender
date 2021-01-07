@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Google app script Excel</title>
+  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+  <style>
+  	input{
+  		width:300px;
+  		font-size:15px;
+  		margin:2px 0;
+  		padding:2px 5px;
+  	}
+  </style>
+  
+</head>
+
+<body>
+  
+  開始列：<input id="startRow"><br/> 
+  開始欄：<input id="startColumn"><br/>
+  結束列：<input id="endRow"><br/> 
+  結束欄：<input id="endColumn"><br/>
+  <button id="sendBtn">查詢</button> || <button id="sendBtn2">查詢全部</button><br/>
+  <h2 id="show"></h2>
+ 
+  <script>
+  var appUrl = 'https://script.google.com/macros/s/AKfycbzD39SyYlxCaCCmD2GbWCh3pm6wK9L_Zt5SaxoeUbPenzX_jX8/exec';//$('#appUrl'),
+  	sheetsUrl = 'https://docs.google.com/spreadsheets/d/186yfVAcTNnUT7ckTxNNBQMHMAlES89zopGOQ_qbgjBY/edit#gid=0';//$('#sheetsUrl'),
+    sheetName = 'Resources',
+    startRow = $('#startRow'),
+    startColumn = $('#startColumn'),
+	endRow = $('#endRow'),
+    endColumn = $('#endColumn'),
+    sendBtn = $('#sendBtn'),
+	sendBtn2 = $('#sendBtn2'),
+    show = $('#show');
+	
+  var parameter = {};
+
+//查詢單筆
+  sendBtn.on('click',function() {
+	console.log('query');
+    parameter = {
+      url: sheetsUrl,
+      name: sheetName,
+      startRow: startRow.val()*1,
+      startColumn: startColumn.val()*1
+    };
+	  $.get(appUrl, parameter, function(data) {
+	  	if(!data){
+	    	show.text('無資料');
+	  	}else{
+	    	show.text(data);
+	  	}
+	  });
+  });
+  
+
+//範圍查詢
+  sendBtn2.on('click',function() {
+    parameter = {
+      url: sheetsUrl,
+      name: sheetName,
+      //startRow: startRow.val()*1,
+      //startColumn: startColumn.val()*1,
+	  endRow: endRow.val()*1,
+      endColumn: endColumn.val()*1,
+	  command: 'getAllResources'
+    };
+	  $.get(appUrl, parameter, function(data) {
+		console.log(data);
+		/*
+	  	if(!data){
+	    	show.text('無資料');
+	  	}else{
+		var d = data.split(',');  //把傳出來的字串分割成陣列
+		var arr = [];  
+		for(var i=0; i<(parameter.endRow-parameter.startRow+1); i++){
+			arr[i] = d.splice(0, (parameter.endColumn-parameter.startColumn+1)); 
+			show.append(arr[i]+'<br/>');
+			}
+	  	}
+		*/
+	  });
+  });
+  
+  </script>
+  
+</body>
+
+</html>
