@@ -7,6 +7,7 @@ $(document).ready(function(){
 			clear_content()
 			render_content('#main', tmp_objects)
 			render_content('#main', tmp)
+
 	  })
 	  
 /*
@@ -40,7 +41,6 @@ $(document).ready(function(){
 		//console.log(data);
 	});
 	*/
-	$.get("https://script.google.com/macros/s/AKfycbzD39SyYlxCaCCmD2GbWCh3pm6wK9L_Zt5SaxoeUbPenzX_jX8/exec");
 	
 });
 data2 = {};
