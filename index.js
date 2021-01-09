@@ -1,11 +1,10 @@
-const appResources = "https://script.google.com/macros/s/AKfycbyz7TsoPaQzvJtidUv4j1ZB7aG5U5PbNVAhj4eWlQ/exec";
-const appMap = "https://script.google.com/macros/s/AKfycbyG0jwoZdvSgH6J84ZtRuTpY0LdH-53eohtGxRT/exec";
+
 var appUrl = 'https://script.google.com/macros/s/AKfycbzD39SyYlxCaCCmD2GbWCh3pm6wK9L_Zt5SaxoeUbPenzX_jX8/exec';
 var sheetsUrl = 'https://docs.google.com/spreadsheets/d/186yfVAcTNnUT7ckTxNNBQMHMAlES89zopGOQ_qbgjBY/edit#gid=0'; //$('#sheetsUrl'),
-//var sheetsUrl = 'https://docs.google.com/spreadsheets/d/1FraqkC39jUQaqJdKbwf8beYhneYVjLRPtz4OpD2FX8I/edit#gid=0';
 var sheetName = 'Resources';
 var inputdata = '';
 var time_format = 'xxxx-xx-xx';
+var selected_dict = {};
 parameter = {
             url: sheetsUrl,
             name: sheetName,
@@ -16,65 +15,72 @@ $(document).ready(function() {
 	
     //setTimeout(render_content('#main', tmp), 1000);
     $('#list_all').click(function() {
-        clear_content()
+        //clear_content()
         //render_content('#main', tmp_objects)
         //render_content('#main', tmp)
         
-		render_content('#main', input_buffer_str)
+		//render_content('#main', input_buffer_str)
         
     })
-	console.log('loading...');
+	
+	$('#list_all').text('loading...')
 	$.get(appUrl, parameter, function(data) {
             //console.log(data);
 			
             input_buffer = JSON.parse(data);
 			input_buffer_str = '';
 			schema = ['source', 'subject', 'tags', 'link', 'title',	'description',	'thumbnail', 'time', 'version'];
+			var num_data = 0;
+			var all_tags = [];
 			if(is_schema_valid(Object.keys(input_buffer.table[0]), schema)){
 				for(var i=0;i<input_buffer.table.length;i++){
-					input_buffer_str+= json_data2html_youtube_component(input_buffer.table[i]);
+					var reg_str = json_data2html_youtube_component(input_buffer.table[i]);
+					var reg_tags = input_buffer.table[i].tags;
+					
+					if (typeof(reg_tags) != 'undefined') {
+						var tmp_tags = reg_tags.trim().split(',')
+						//console.log(tags);
+						if (tmp_tags != '') {
+							for (var j = 0; j < tmp_tags.length; j++) {
+								if(tmp_tags[j]!=''){
+									if(all_tags.includes(tmp_tags[j].trim())){	
+									}else{
+										//console.log(tmp_tags[j].trim());
+										all_tags.push(tmp_tags[j].trim());
+									}
+								}
+							}
+						}
+					}
+					
+					if (reg_str!=''){
+						input_buffer_str+= reg_str;
+						num_data++;
+					}
 				}
+				console.log(num_data + ' records to display');
 				
 			}
-			console.log('done.');
+			//$('#list_all').text("List of all tutorial videos by subject's alphabets");
+			update_statistics();
+			all_tags.sort();
+			for(var j=0;j<all_tags.length;j++){
+				selected_dict[all_tags[j].replaceAll(' ','_')] = true;
+			}
+			update_subject_tags(all_tags);			
+			//console.log('tags:'+all_tags);
+			render_content('#main', input_buffer_str)
         });
 
-    /*
-        npc_sets = [];
-        NpcRole = [];
-    	$.get(appMap, {
-            "map_id": 1,
-            "command": "GetNPCsFromMapID"
-        }, function (data) {
-    		 tmp = data;
-    		//console.log(data)
-    	});
-    	*/
-    /*
-    $.getJSON("https://spreadsheets.google.com/feeds/cells/1EA0FNh6uL8xEUK6r2tC21WcGoctYu5VTLHrHmYD4n14/1/public/values?alt=json"
-		
-	
-    , function (data) {
-		inputdata = data;
-		let table_schema = [
-			{'name': 'source','type':'string'},
-			{'name': 'subjects', 'type':'string'},
-			{'name': 'tags', 'type':'string'},
-			{'name': 'link', 'type':'string'},
-			{'name': 'title', 'type':'string'},
-			{'name': 'description', 'type':'string'},
-			{'name': 'thumbnail', 'type':'string'},
-			{'name': 'time', 'type':'string'},
-		];
-		formed_data = format_data(table_schema, data);
-		//console.log(data);
-	});
-	*/
+ 
 
 });
 data2 = {};
 data2['table'] = [];
 fields = [];
+function update_statistics(){
+	
+}
 
 function is_schema_valid(record, schema){
 	if(record.length >= schema.length){
@@ -130,11 +136,63 @@ function format_data(table_schema, rawdata) {
         }
     }
 }
+function subject_click(elemnt){	
+	elemnt_value = elemnt.innerText;
+	console.log(elemnt);
+	console.log(elemnt_value);
+	if(selected_dict[elemnt_value.replaceAll(' ','_')]){
+		selected_dict[elemnt_value.replaceAll(' ','_')] = false;
+		var tmp_flag = '#flag_' + elemnt_value.replaceAll(' ','_');
+		$(tmp_flag).removeClass('bg-primary');
+		$(tmp_flag).addClass('bg-secondary');
+		$('.tag_'+elemnt_value.replaceAll(' ','_')).hide();
+		$('.subject_'+elemnt_value.replaceAll(' ','_')).hide();
+	}else{
+		selected_dict[elemnt_value.replaceAll(' ','_')] = true;
+		var tmp_flag = '#flag_' + elemnt_value.replaceAll(' ','_');
+		$(tmp_flag).removeClass('bg-secondary');
+		$(tmp_flag).addClass('bg-primary');
+		$('.tag_'+elemnt_value.replaceAll(' ','_')).show();
+		$('.subject_'+elemnt_value.replaceAll(' ','_')).show();
+	}
+}
+var is_all_selected = true;
+function subject_selectAll(){
+	if(is_all_selected){		
+		$('.flag').removeClass('bg-primary');
+		$('.flag').addClass('bg-secondary');
+		$('#flag_all').removeClass('bg-primary');
+		$('#flag_all').addClass('bg-secondary');
+		is_all_selected = false;
+		for(item_id in selected_dict){
+			selected_dict[item_id] = false;
+		}
+		$('.records').hide();
+	}else{		
+		$('.flag').removeClass('bg-secondary');
+		$('.flag').addClass('bg-primary');
+		$('#flag_all').removeClass('bg-secondary');
+		$('#flag_all').addClass('bg-primary');
+		is_all_selected = true;
+		$('.records').show();
+	}
+}
 
+function update_subject_tags(all_tags){
+	var reg_str = '';
+	reg_str += '<span class="badge bg-primary" id="flag_all" onclick="subject_selectAll()">ALL</span>\n';
+	for(var i=0;i<all_tags.length;i++){
+		//reg_str+= '<button type="button" class="btn btn-outline-primary" id="flag_'+ all_tags[i].trim().replaceAll(' ','_') +'" onclick="subject_click(this)">' + all_tags[i] + '</button> ';
+		reg_str+= '<span class="badge bg-primary flag" id="flag_'+ all_tags[i].replaceAll(' ','_') +'" onclick=subject_click(this)>'+ all_tags[i]	 +'</span>\n'
+	}
+	//console.log(reg_str);
+	render_content('#div_tags', reg_str);
+}
+/*
 function render_object_tag(div_id, string) {
     $(div_id).append(string)
 }
-
+*/
 function render_content(div_id, string) {
     $(div_id).append(string)
 }
@@ -144,7 +202,7 @@ function clear_content(div_id) {
 }
 
 function object2string(object) {
-    string = '<button type="button" class="btn btn-outline-primary">' + object + '</button> '
+    string = '        <button type="button" class="btn btn-outline-primary">' + object + '</button> '
     return string
 
 }
@@ -158,33 +216,45 @@ function json_data2html_youtube_component(json_data) {
 	source = json_data.source;
 	subject = json_data.subject; 
 	thumbnail = json_data.thumbnail;
-	
+
 	
 	link = json_data.link;
     if (tags_str == '' & subject == '') {
         return ''
     }
-    string = '<div class="row mt-3">'
+    string = '<div class="row mt-3 records subject_' + subject.replaceAll(' ','_')+' ';
+	for(var j=0;j<tags_str.split(',').length;j++){
+		string+= 'tag_'+tags_str.split(',')[j].trim().replaceAll(' ','_') + ' ';
+	}
+	string += '">';
     string += '<div class="col-3">'
     string += '        <img src="' + thumbnail + '" class="rounded float-start img-thumbnail" alt="...">'
     string += '</div><br/>'
     string += '<div class="col-9">'
-    string += '        <p><b>' + title + '</b></p>'
-    string += '        <p>' + description + '</p>'
+    string += '        <p><a href="' +link+'" target="_blank"><b>' + title + '</b></a></p>'
+    //string += '        <p>' + description + '</p>'
     if (subject != '') {
-        string += '        <button type="button" class="btn btn-outline-primary">' + subject + '</button>'
+        //string += '        <button type="button" class="btn btn-outline-primary">' + subject + '</button>'
+		string += '<span class="badge bg-danger">'+ subject +'</span>\n'
     }
-    string += '        <button type="button" class="btn btn-outline-secondary">' + source + '</button>'
-    if (typeof(version) != 'undefined') {
-        string += '<button type="button" class="btn btn-outline-primary">Blender ' + version + '</button>'
+    //string += '        <button type="button" class="btn btn-outline-secondary">' + source + '</button> '
+	string += '<span class="badge bg-light text-dark">'+ source +'</span>\n'
+    if (typeof(version) == 'undefined') {
+	}else if (version == ''){
+		//string += '<span class="badge bg-dark">Blender ver: NA</span>\n'
+	}else{
+        //string += '<button type="button" class="btn btn-outline-primary">Blender ' + version + '</button>'
+		string += '<span class="badge bg-dark">Blender ver:'+ version +'</span>\n'
     }
     if (typeof(tags_str) != 'undefined') {
         tags = tags_str.trimEnd().split(',')
 		//console.log(tags);
         if (tags != '') {
+			
             for (i = 0; i < tags.length; i++) {
 				if(tags[i]!=''){
-					string += '        <button type="button" class="btn btn-primary">' + tags[i].trim() + '</button>'
+					//string += '        <button type="button" class="btn btn-primary">' + tags[i].trim() + '</button>'
+					string += '<span class="badge bg-primary">'+ tags[i].trim() +'</span>\n'
 				}
             }
         }
@@ -200,6 +270,7 @@ function json_data2html_youtube_component(json_data) {
 	
     string += '</div>'
     string += '</div>'
+	console.log(string);
     return string
 }
 
