@@ -270,7 +270,7 @@ function json_data2html_youtube_component(json_data) {
 	
     string += '</div>'
     string += '</div>'
-	console.log(string);
+	//console.log(string);
     return string
 }
 
