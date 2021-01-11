@@ -136,10 +136,11 @@ function format_data(table_schema, rawdata) {
         }
     }
 }
+var current_view;
 function subject_click(elemnt){	
 	elemnt_value = elemnt.innerText;
-	console.log(elemnt);
-	console.log(elemnt_value);
+	//console.log(elemnt);
+	//console.log(elemnt_value);
 	if(selected_dict[elemnt_value.replaceAll(' ','_')]){
 		selected_dict[elemnt_value.replaceAll(' ','_')] = false;
 		var tmp_flag = '#flag_' + elemnt_value.replaceAll(' ','_');
@@ -155,6 +156,8 @@ function subject_click(elemnt){
 		$('.tag_'+elemnt_value.replaceAll(' ','_')).show();
 		$('.subject_'+elemnt_value.replaceAll(' ','_')).show();
 	}
+	$('.current_view').removeClass('current_view');
+	$('.records:visible').addClass('current_view');
 }
 var is_all_selected = true;
 function subject_selectAll(){
@@ -205,6 +208,61 @@ function object2string(object) {
     string = '        <button type="button" class="btn btn-outline-primary">' + object + '</button> '
     return string
 
+}
+
+function search_string_proc(e){
+	var input_str = $('#search_string').val();
+	
+	var input_str_array = input_str.split(',');
+	//console.log(input_str.slice(-1));
+	/*if (input_str.trim().slice(-1) != ','){
+		console.log('no search');
+		return
+	}*/
+	if(input_str == ''){
+		for(var iv=0;iv<$('.current_view').length;iv++){
+			$('.current_view')[iv].hidden = false;
+		}
+		console.log('no input');
+		return;
+	}
+	console.log('start search');
+	for(var iv=0;iv<$('.current_view').length;iv++){
+		$('.current_view')[iv].hidden = false;
+	}
+	var current_visible_records = $('.records:visible');
+	console.log(current_visible_records);
+	for(var j=0;j<current_visible_records.length;j++){
+		console.log(j);
+		var is_str_included= false;
+		console.log('record:'+current_visible_records[j].childNodes[2].childNodes[1].innerText);
+		for(var i=0;i<input_str_array.length;i++){
+			var kw_to_search = input_str_array[i].trim();
+			if(kw_to_search==''){
+				continue
+			}else{
+				console.log($('.records:visible'));
+				console.log(j);
+				if(current_visible_records[j].childNodes[2].childNodes[1].innerText.includes(kw_to_search)){
+					console.log('has '+kw_to_search+'!');
+					is_str_included = true;
+				}else{
+					is_str_included = false;
+				}
+			}
+			//$('.records:visible')[j].childNodes[2].childNodes[1].innerHTML = '<a href="https://www.youtube.com/watch?v=JjW6r10Mlqs" target="_blank"><b>Create any low poly animal | Blender | 10 mins</b></a>'
+		}
+		if(!is_str_included){
+			
+			console.log('not match');
+			current_visible_records[j].hidden = true;
+		}else{
+			console.log('match:'+current_visible_records[j].childNodes[2].childNodes[1].innerText);
+			
+		}
+	}
+	
+	
 }
 
 function json_data2html_youtube_component(json_data) {
